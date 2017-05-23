@@ -125,6 +125,7 @@ class File(Base):
     def filepath(self):
         return os.path.join(self.directory, self.filename)
 
+    # TODO use this: https://github.com/pandas-dev/pandas/blob/master/pandas/io/common.py#L179
     def save(self, filename=None, directory=None):
         """Save the DOT source to file. Ensure the file ends with a newline.
 
@@ -143,13 +144,17 @@ class File(Base):
         tools.mkdirs(filepath)
 
         data = text_type(self.source)
+        if not data.endswith(u'\n'):
+            data += u'\n'
 
-        with io.open(filepath, 'w', encoding=self.encoding) as fd:
-            fd.write(data)
-            if not data.endswith(u'\n'):
-                fd.write(u'\n')
+        if tools.is_file_like(filename):
+            filename.write(data)
+            return filename
+        else:
+            with io.open(filepath, 'w', encoding=self.encoding) as fd:
+                fd.write(data)
 
-        return filepath
+            return filepath
 
     def render(self, filename=None, directory=None, view=False, cleanup=False):
         """Save the source to file and render with the Graphviz engine.
