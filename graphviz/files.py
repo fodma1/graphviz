@@ -135,22 +135,22 @@ class File(Base):
         Returns:
             The (possibly relative) path of the saved source file.
         """
-        if filename is not None:
-            self.filename = filename
-        if directory is not None:
-            self.directory = directory
-
-        filepath = self.filepath
-        tools.mkdirs(filepath)
-
         data = text_type(self.source)
         if not data.endswith(u'\n'):
             data += u'\n'
-
         if tools.is_file_like(filename):
             filename.write(data)
             return filename
         else:
+
+            if filename is not None:
+                self.filename = filename
+            if directory is not None:
+                self.directory = directory
+
+            filepath = self.filepath
+            tools.mkdirs(filepath)
+
             with io.open(filepath, 'w', encoding=self.encoding) as fd:
                 fd.write(data)
 
